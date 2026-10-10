@@ -1,10 +1,3 @@
-# ============================================================
-#  DATA MINING ANALYSIS OF FARMERS' SATISFACTION
-#  WITH AGRICULTURAL SUPPORT SERVICES
-#  Talacogon, Agusan del Sur
-#  Decision Tree | Naive Bayes | K-Means Clustering
-# ============================================================
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -130,28 +123,18 @@ h1, h2, h3, h4 { color: #1c1917; font-weight: 700; }
 # ============================================================
 # CONSTANTS
 # ============================================================
-NON_LIKERT_KEYWORDS = (
-    'age', 'income', 'years in farming', 'farm size', 'hectare', 'hetare',
-    'barangay', 'civil status', 'educational', 'main type of crop',
-    'sex', 'gender', 'name', 'contact', 'phone', 'date', 'time',
-    'latitude', 'longitude', 'gps', 'row no', 'frequency',
-)
-
 LIKERT_SECTION_MAP = {
-    'accessibility':            ('ACC',  'Accessibility'),
-    'efficiency':               ('EFF',  'Efficiency'),
-    'reliability':              ('REL',  'Reliability'),
-    'overall service quality':  ('QUAL', 'Overall Quality'),
-    'service delivery':         ('SD',   'Service Delivery'),
-    'availability of resources':('RES',  'Availability of Resources'),
-    'communication':            ('COMM', 'Communication'),
-    'timeliness':               ('TIME', 'Timeliness'),
+    'accessibility':             ('ACC',  'Accessibility'),
+    'efficiency':                ('EFF',  'Efficiency'),
+    'reliability':               ('REL',  'Reliability'),
+    'overall service quality':   ('QUAL', 'Overall Quality'),
+    'service delivery':          ('SD',   'Service Delivery'),
+    'availability of resources': ('RES',  'Availability of Resources'),
+    'communication':             ('COMM', 'Communication'),
+    'timeliness':                ('TIME', 'Timeliness'),
 }
 
-# Sections used as the satisfaction LABEL (excluded from features)
-LABEL_SECTIONS = {'ACC', 'EFF', 'REL', 'QUAL'}
-
-# All sections that are Likert 1-5
+LABEL_SECTIONS      = {'ACC', 'EFF', 'REL', 'QUAL'}
 ALL_LIKERT_PREFIXES = ('ACC', 'EFF', 'REL', 'QUAL', 'SD', 'RES', 'COMM', 'TIME')
 
 # ============================================================
@@ -183,14 +166,34 @@ def _to_numeric(v):
         return np.nan
 
 
-def _detect_header_row(raw, scan_rows=8, min_fill=0.6):
-    """Pick the row that looks like the real column-name row."""
+def _detect_header_row(raw, scan_rows=8, min_fill=0.5):
+    """
+    Pick the row that looks like the real column-name row.
+
+    The score favours rows that are:
+      - well-populated (>= min_fill of cells are non-null)
+      - highly unique (each cell contains a distinct value -> a real
+        column name, not a merged section banner repeated across columns)
+    """
     ncols = raw.shape[1]
+    best_idx   = 0
+    best_score = -1
+
     for i in range(min(scan_rows, len(raw))):
         row = raw.iloc[i]
-        if row.notna().sum() >= ncols * min_fill:
-            return i
-    return 0
+        non_null = row.notna().sum()
+        if non_null < ncols * min_fill:
+            continue
+
+        uniq = row.dropna().astype(str).nunique()
+        fill = non_null / ncols
+        score = uniq * fill
+
+        if score > best_score:
+            best_score = score
+            best_idx   = i
+
+    return best_idx
 
 
 def _build_clean_columns(section_row, question_row):
@@ -236,21 +239,17 @@ def _build_clean_columns(section_row, question_row):
 
 def _clean_dataframe(df):
     """Apply cleaning rules to the raw sliced table."""
-    # 1) trim strings
     for c in df.columns:
         if df[c].dtype == 'object':
             df[c] = df[c].apply(_clean_text)
 
-    # 2) drop rows that are almost empty (< 35% non-null cells)
     min_nonnull = max(2, int(df.shape[1] * 0.35))
     df = df[df.notna().sum(axis=1) >= min_nonnull]
 
-    # 3) numeric-coerce Likert columns
     for c in df.columns:
         if re.match(r'^(ACC|EFF|REL|QUAL|SD|RES|COMM|TIME)_Q\d+$', str(c)):
             df[c] = df[c].apply(_to_numeric)
 
-    # 4) standardize Yes/No in binary columns
     for c in df.columns:
         if re.match(r'^(SVC|YN)_Q\d+$', str(c)):
             df[c] = (df[c]
@@ -261,7 +260,6 @@ def _clean_dataframe(df):
                                'yes': 'Yes', 'no': 'No',
                                'y': 'Yes', 'n': 'No'}))
 
-    # 5) title-case a few known profile columns
     for c in ('Sex', 'Civil Status', 'Barangay',
               'Types of Farming Area', 'Highest Educational Attainment'):
         if c in df.columns:
@@ -592,10 +590,10 @@ if page == "Overview":
     brgy_count = df_clean['Barangay'].nunique() if 'Barangay' in df_clean.columns else 0
 
     for col, lab, val, sub in [
-        (c1, "Respondents",       f"{len(X):,}",                 "After cleaning"),
-        (c2, "Barangays",         f"{brgy_count}",               "Covered areas"),
-        (c3, "Mean Score",        f"{np.mean(overall_scores):.2f}", "Scale of 1-5"),
-        (c4, "Silhouette",        f"{sil_score:.3f}",            f"K = {k_clusters}"),
+        (c1, "Respondents", f"{len(X):,}",                       "After cleaning"),
+        (c2, "Barangays",   f"{brgy_count}",                     "Covered areas"),
+        (c3, "Mean Score",  f"{np.mean(overall_scores):.2f}",    "Scale of 1-5"),
+        (c4, "Silhouette",  f"{sil_score:.3f}",                  f"K = {k_clusters}"),
     ]:
         col.markdown(f"""
         <div class="metric-card">
@@ -637,9 +635,10 @@ if page == "Overview":
 
         st.markdown(f"""
         <div class="info-box" style="margin-top:12px;">
-        The mean Likert score across all <b>{len(all_likert_cols(get_sections(df_clean)))}</b> 
-        satisfaction and factor items is <b>{np.mean(overall_scores):.2f}</b>. 
-        Scores at or above <b>3.41</b> are classified as Satisfied or above, 
+        The mean Likert score across all
+        <b>{len(all_likert_cols(get_sections(df_clean)))}</b>
+        satisfaction and factor items is <b>{np.mean(overall_scores):.2f}</b>.
+        Scores at or above <b>3.41</b> are classified as Satisfied or above,
         following the standard five-point Likert interpretation scale.
         </div>
         """, unsafe_allow_html=True)
@@ -655,7 +654,7 @@ if page == "Overview":
 
 
 # ============================================================
-# PAGE: DATA EXPLORER  (CF §3.5 Preprocessing evidence)
+# PAGE: DATA EXPLORER  (§3.5 Preprocessing evidence)
 # ============================================================
 elif page == "Data Explorer":
     st.markdown("## Data Explorer")
@@ -687,10 +686,10 @@ elif page == "Data Explorer":
                 unsafe_allow_html=True)
     sections = get_sections(df_clean)
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Profile Columns",      len(sections['profile']))
-    c2.metric("Services Received",    len(sections['SVC']))
-    c3.metric("Yes / No Items",       len(sections['YN']))
-    c4.metric("Likert Items",         len(all_likert_cols(sections)))
+    c1.metric("Profile Columns",   len(sections['profile']))
+    c2.metric("Services Received", len(sections['SVC']))
+    c3.metric("Yes / No Items",    len(sections['YN']))
+    c4.metric("Likert Items",      len(all_likert_cols(sections)))
 
     st.download_button(
         "Download cleaned dataset (CSV)",
@@ -767,14 +766,14 @@ elif page == "Patterns & Trends":
         st.markdown("<div class='section-header'>Section-Level Mean Scores</div>",
                     unsafe_allow_html=True)
         section_means = {}
-        for pref, (_, name) in LIKERT_SECTION_MAP.items():
-            cols = sections.get(LIKERT_SECTION_MAP[pref][0], [])
+        for key, (prefix, label) in LIKERT_SECTION_MAP.items():
+            cols = sections.get(prefix, [])
             if cols:
-                section_means[name] = (df_clean[cols]
-                                       .apply(pd.to_numeric, errors='coerce')
-                                       .mean().mean())
+                section_means[label] = (df_clean[cols]
+                                        .apply(pd.to_numeric, errors='coerce')
+                                        .mean().mean())
         sec_df = pd.DataFrame({
-            'Section': list(section_means.keys()),
+            'Section':    list(section_means.keys()),
             'Mean Score': [round(v, 3) for v in section_means.values()],
         }).sort_values('Mean Score', ascending=False)
         sec_df['Interpretation'] = sec_df['Mean Score'].apply(classify_score)
@@ -799,7 +798,7 @@ elif page == "Patterns & Trends":
 
 
 # ============================================================
-# PAGE: CLASSIFICATION  (Chapter 3.7 - DT + NB)
+# PAGE: CLASSIFICATION  (§3.7 - DT + NB)
 # ============================================================
 elif page == "Classification":
     st.markdown("## Classification Analysis")
@@ -876,7 +875,7 @@ elif page == "Classification":
 
 
 # ============================================================
-# PAGE: CLUSTERING  (Chapter 3.7 - K-Means)
+# PAGE: CLUSTERING  (§3.7 - K-Means)
 # ============================================================
 elif page == "Clustering":
     st.markdown("## K-Means Clustering")
@@ -963,8 +962,8 @@ elif page == "Key Factors":
     st.markdown("## Key Factors Affecting Satisfaction")
     st.markdown(
         "<p style='color:#78716c; margin-top:-8px;'>"
-        "Factors derived from the Decision Tree, correlation analysis, and "
-        "section-level score comparison.</p>",
+        "Factors derived from Decision Tree feature importance, section-level "
+        "score comparison, and correlation analysis.</p>",
         unsafe_allow_html=True,
     )
 
@@ -1001,13 +1000,13 @@ elif page == "Key Factors":
         st.dataframe(group, use_container_width=True)
         st.markdown("""
         <div class="info-box" style="margin-top:12px;">
-        Rows are the satisfaction levels, columns are the section mean scores. 
-        A well-separated table (each row distinct) suggests that section-level 
+        Rows are the satisfaction levels, columns are the section mean scores.
+        A well-separated table (each row distinct) suggests that section-level
         scores are strong discriminators of overall satisfaction.
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<div class='section-header'>Correlation of Likert Factors with Overall Score</div>",
+    st.markdown("<div class='section-header'>Correlation of Factor Likert Items with Overall Score</div>",
                 unsafe_allow_html=True)
     factor_prefixes = ('SD', 'RES', 'COMM', 'TIME')
     factor_cols = []
@@ -1021,8 +1020,8 @@ elif page == "Key Factors":
                        .sort_values(ascending=False))
         fig, ax = plt.subplots(figsize=(10, max(3.5, len(corr) * 0.3)))
         colors_corr = ['#15803d' if v > 0 else '#c2410c' for v in corr.values]
-        ax.barh(corr.index[::-1], corr.values[::-1], color=colors_corr[::-1],
-                alpha=0.85)
+        ax.barh(corr.index[::-1], corr.values[::-1],
+                color=colors_corr[::-1], alpha=0.85)
         ax.set_xlabel("Pearson correlation with overall satisfaction score")
         ax.axvline(0, color='black', linewidth=0.8)
         ax.grid(axis='x', alpha=0.25)
@@ -1031,24 +1030,15 @@ elif page == "Key Factors":
         plt.tight_layout()
         st.pyplot(fig); plt.close()
 
-    st.markdown("""
-    <div class="info-box" style="margin-top:12px;">
-    <b>Reading the feature importance and correlation charts together</b> identifies 
-    which accessibility, efficiency, reliability, quality, service delivery, 
-    resource availability, communication, and timeliness dimensions most strongly 
-    drive satisfaction across the barangays of Talacogon.
-    </div>
-    """, unsafe_allow_html=True)
-
 
 # ============================================================
-# PAGE: CROSS-VALIDATION  (Chapter 3.8 - 10-fold CV)
+# PAGE: CROSS-VALIDATION  (§3.8 - 10-fold CV)
 # ============================================================
 elif page == "Cross-Validation":
     st.markdown(f"## {cv_folds}-Fold Cross-Validation")
     st.markdown(
         "<p style='color:#78716c; margin-top:-8px;'>"
-        "Each algorithm is trained on 9 folds and validated on the remaining "
+        "Each algorithm is trained on K-1 folds and validated on the remaining "
         "fold. The procedure is repeated until every fold has served as the "
         "validation set once (Chapter 3.8).</p>",
         unsafe_allow_html=True,
