@@ -1,3 +1,10 @@
+# ============================================================
+#  DATA MINING ANALYSIS OF FARMERS' SATISFACTION
+#  WITH AGRICULTURAL SUPPORT SERVICES
+#  Talacogon, Agusan del Sur
+#  Decision Tree | Naive Bayes | K-Means Clustering
+# ============================================================
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -30,7 +37,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# UI THEME  (terracotta / amber / espresso - warm palette)
+# UI THEME
 # ============================================================
 st.markdown("""
 <style>
@@ -55,9 +62,7 @@ h1, h2, h3, h4 { color: #1c1917; font-weight: 700; }
 
 .hero {
     background: linear-gradient(135deg, #c2410c 0%, #d97706 100%);
-    border-radius: 16px;
-    padding: 30px 34px;
-    color: #ffffff;
+    border-radius: 16px; padding: 30px 34px; color: #ffffff;
     margin-bottom: 24px;
     box-shadow: 0 12px 24px -8px rgba(194, 65, 12, 0.4);
 }
@@ -65,58 +70,28 @@ h1, h2, h3, h4 { color: #1c1917; font-weight: 700; }
 .hero p  { color: #fde68a; margin: 0; font-size: 0.92rem; }
 
 .metric-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 18px 20px;
-    border: 1px solid #e7e5e4;
-    border-top: 3px solid #c2410c;
-    box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04);
-    height: 100%;
+    background: #ffffff; border-radius: 12px; padding: 18px 20px;
+    border: 1px solid #e7e5e4; border-top: 3px solid #c2410c;
+    box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04); height: 100%;
 }
-.metric-label {
-    color: #78716c; font-size: 0.70rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.09em;
-}
-.metric-value {
-    color: #1c1917; font-size: 1.85rem; font-weight: 800;
-    margin-top: 6px; line-height: 1.1;
-}
+.metric-label { color: #78716c; font-size: 0.70rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; }
+.metric-value { color: #1c1917; font-size: 1.85rem; font-weight: 800; margin-top: 6px; line-height: 1.1; }
 .metric-sub { color: #b45309; font-size: 0.76rem; font-weight: 500; margin-top: 6px; }
 
 .section-header {
     color: #1c1917; font-size: 1.1rem; font-weight: 700;
-    border-left: 4px solid #c2410c;
-    padding-left: 12px;
-    margin: 26px 0 14px 0;
+    border-left: 4px solid #c2410c; padding-left: 12px; margin: 26px 0 14px 0;
 }
 
-.info-box {
-    background: #fff7ed; border: 1px solid #fed7aa;
-    border-radius: 10px; padding: 15px 18px;
-    color: #7c2d12; font-size: 0.88rem; line-height: 1.6;
-}
-.warn-box {
-    background: #fefce8; border: 1px solid #fde68a;
-    border-radius: 10px; padding: 15px 18px;
-    color: #713f12; font-size: 0.88rem; line-height: 1.6;
-}
-.success-box {
-    background: #f0fdf4; border: 1px solid #bbf7d0;
-    border-radius: 10px; padding: 15px 18px;
-    color: #14532d; font-size: 0.88rem; line-height: 1.6;
-}
+.info-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 15px 18px; color: #7c2d12; font-size: 0.88rem; line-height: 1.6; }
+.warn-box { background: #fefce8; border: 1px solid #fde68a; border-radius: 10px; padding: 15px 18px; color: #713f12; font-size: 0.88rem; line-height: 1.6; }
+.success-box { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 15px 18px; color: #14532d; font-size: 0.88rem; line-height: 1.6; }
 .sidebar-title { color: #fcd34d; margin: 0; font-size: 1.1rem; font-weight: 800; }
 .sidebar-sub   { color: #a8a29e; font-size: 0.76rem; margin-top: 4px; }
 
 .stTabs [data-baseweb="tab-list"] { gap: 4px; border-bottom: 1px solid #e7e5e4; }
-.stTabs [data-baseweb="tab"] {
-    background-color: transparent; border-radius: 8px 8px 0 0;
-    padding: 12px 20px; font-weight: 600; color: #78716c;
-}
-.stTabs [aria-selected="true"] {
-    background-color: #ffffff !important; color: #c2410c !important;
-    border-bottom: 2px solid #c2410c;
-}
+.stTabs [data-baseweb="tab"] { background-color: transparent; border-radius: 8px 8px 0 0; padding: 12px 20px; font-weight: 600; color: #78716c; }
+.stTabs [aria-selected="true"] { background-color: #ffffff !important; color: #c2410c !important; border-bottom: 2px solid #c2410c; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -124,24 +99,23 @@ h1, h2, h3, h4 { color: #1c1917; font-weight: 700; }
 # CONSTANTS
 # ============================================================
 LIKERT_SECTION_MAP = {
-    'accessibility':             ('ACC',  'Accessibility'),
-    'efficiency':                ('EFF',  'Efficiency'),
-    'reliability':               ('REL',  'Reliability'),
-    'overall service quality':   ('QUAL', 'Overall Quality'),
-    'service delivery':          ('SD',   'Service Delivery'),
-    'availability of resources': ('RES',  'Availability of Resources'),
-    'communication':             ('COMM', 'Communication'),
-    'timeliness':                ('TIME', 'Timeliness'),
+    'accessib':      ('ACC',  'Accessibility'),
+    'efficien':      ('EFF',  'Efficiency'),
+    'reliab':        ('REL',  'Reliability'),
+    'overall':       ('QUAL', 'Overall Quality'),
+    'service deliv': ('SD',   'Service Delivery'),
+    'availability':  ('RES',  'Availability of Resources'),
+    'communicat':    ('COMM', 'Communication'),
+    'timeli':        ('TIME', 'Timeliness'),
 }
 
 LABEL_SECTIONS      = {'ACC', 'EFF', 'REL', 'QUAL'}
 ALL_LIKERT_PREFIXES = ('ACC', 'EFF', 'REL', 'QUAL', 'SD', 'RES', 'COMM', 'TIME')
 
 # ============================================================
-# HELPERS - CLEANING
+# CLEANING HELPERS
 # ============================================================
 def _clean_text(v):
-    """Strip, collapse internal whitespace, normalize junk to None."""
     if pd.isna(v):
         return None
     s = str(v).strip()
@@ -152,7 +126,6 @@ def _clean_text(v):
 
 
 def _to_numeric(v):
-    """Best-effort numeric conversion; returns NaN for non-numeric."""
     if pd.isna(v):
         return np.nan
     if isinstance(v, (int, float, np.integer, np.floating)):
@@ -170,34 +143,51 @@ def _detect_header_row(raw, scan_rows=8, min_fill=0.5):
     """
     Pick the row that looks like the real column-name row.
 
-    The score favours rows that are:
-      - well-populated (>= min_fill of cells are non-null)
-      - highly unique (each cell contains a distinct value -> a real
-        column name, not a merged section banner repeated across columns)
+    Scores each candidate row: unique non-null values * fill ratio.
+    The section banner row has few unique values (one per section).
+    The question-text row has many unique values (one per column).
     """
     ncols = raw.shape[1]
-    best_idx   = 0
-    best_score = -1
+    best_idx, best_score = 0, -1
 
     for i in range(min(scan_rows, len(raw))):
         row = raw.iloc[i]
         non_null = row.notna().sum()
         if non_null < ncols * min_fill:
             continue
-
         uniq = row.dropna().astype(str).nunique()
         fill = non_null / ncols
         score = uniq * fill
-
         if score > best_score:
             best_score = score
-            best_idx   = i
+            best_idx = i
 
     return best_idx
 
 
+def _classify_section(sec_text):
+    """Return a section prefix code based on the section header text."""
+    if not sec_text:
+        return None
+    s = str(sec_text).lower()
+
+    if 'respondent profile' in s or 'profile sa' in s:
+        return 'PROFILE'
+    if 'services received' in s or 'nadawat' in s:
+        return 'SVC'
+    if 'open-ended' in s or 'open ended' in s:
+        return 'OPEN'
+    if 'yes or no' in s or 'answerable' in s:
+        return 'YN'
+
+    for key, (prefix, _) in LIKERT_SECTION_MAP.items():
+        if key in s:
+            return prefix
+
+    return None
+
+
 def _build_clean_columns(section_row, question_row):
-    """Combine a section header row + a question-text row into unique names."""
     counters, seen, out = {}, {}, []
 
     def _unique(name):
@@ -208,37 +198,32 @@ def _build_clean_columns(section_row, question_row):
         return f"{name}_{seen[name]}"
 
     for sec, q in zip(section_row, question_row):
-        sec_s = _clean_text(sec) or ''
-        q_s   = _clean_text(q)   or 'column'
-        sec_l = sec_s.lower()
+        sec_clean = _clean_text(sec)
+        q_clean   = _clean_text(q) or 'column'
+        code      = _classify_section(sec_clean)
 
-        if 'respondent profile' in sec_l:
-            name = _unique(q_s[:55])
-        elif 'services received' in sec_l:
+        if code == 'PROFILE':
+            name = _unique(q_clean[:55])
+        elif code == 'SVC':
             counters['SVC'] = counters.get('SVC', 0) + 1
             name = f"SVC_Q{counters['SVC']}"
+        elif code == 'OPEN':
+            counters['OPEN'] = counters.get('OPEN', 0) + 1
+            name = f"OPEN_Q{counters['OPEN']}"
+        elif code == 'YN':
+            counters['YN'] = counters.get('YN', 0) + 1
+            name = f"YN_Q{counters['YN']}"
+        elif code in ALL_LIKERT_PREFIXES:
+            counters[code] = counters.get(code, 0) + 1
+            name = f"{code}_Q{counters[code]}"
         else:
-            name = None
-            for key, (prefix, _) in LIKERT_SECTION_MAP.items():
-                if key in sec_l:
-                    counters[prefix] = counters.get(prefix, 0) + 1
-                    name = f"{prefix}_Q{counters[prefix]}"
-                    break
-            if name is None:
-                if 'yes or no' in sec_l or 'answerable by' in sec_l:
-                    counters['YN'] = counters.get('YN', 0) + 1
-                    name = f"YN_Q{counters['YN']}"
-                elif 'open-ended' in sec_l or 'open ended' in sec_l:
-                    counters['OPEN'] = counters.get('OPEN', 0) + 1
-                    name = f"OPEN_Q{counters['OPEN']}"
-                else:
-                    name = _unique(q_s[:55])
+            name = _unique(q_clean[:55])
+
         out.append(name)
     return out
 
 
 def _clean_dataframe(df):
-    """Apply cleaning rules to the raw sliced table."""
     for c in df.columns:
         if df[c].dtype == 'object':
             df[c] = df[c].apply(_clean_text)
@@ -273,7 +258,7 @@ def _clean_dataframe(df):
 
 @st.cache_data(show_spinner=False)
 def load_and_clean():
-    """Find, read, header-repair, and clean the survey file."""
+    """Load the survey file, repair the multi-row header, and clean."""
     search_paths = ['.', './data', '/content', '/content/data']
     files = []
     for p in search_paths:
@@ -282,7 +267,7 @@ def load_and_clean():
                 files += glob.glob(os.path.join(p, ext))
 
     if not files:
-        return None, None, None
+        return None, None, None, None
 
     responses = [f for f in files if 'template' not in os.path.basename(f).lower()]
     preferred = [f for f in responses
@@ -304,16 +289,16 @@ def load_and_clean():
             raw = pd.read_excel(target, header=None, sheet_name=0)
     except Exception as e:
         st.error(f"Could not read {target}: {e}")
-        return None, None, None
+        return None, None, None, None
 
     if raw is None or raw.empty or raw.shape[1] < 2:
-        return None, None, None
+        return None, None, None, None
 
     header_idx  = _detect_header_row(raw)
     section_idx = header_idx - 1 if header_idx > 0 else None
 
-    section_row  = raw.iloc[section_idx].ffill().tolist() if section_idx is not None \
-                   else [''] * raw.shape[1]
+    section_row  = (raw.iloc[section_idx].ffill().tolist()
+                    if section_idx is not None else [''] * raw.shape[1])
     question_row = raw.iloc[header_idx].tolist()
 
     clean_cols = _build_clean_columns(section_row, question_row)
@@ -324,17 +309,17 @@ def load_and_clean():
     data = _clean_dataframe(data)
 
     meta = {
-        'header_row_excel': header_idx + 1,
+        'header_row_excel':  header_idx + 1,
         'section_row_excel': (section_idx + 1) if section_idx is not None else None,
+        'raw_shape':         raw.shape,
     }
-    return data, base_name, meta
+    return data, base_name, meta, raw
 
 
 # ============================================================
-# SECTION UTILITIES
+# SECTIONS
 # ============================================================
 def get_sections(df):
-    """Return dict of section prefix -> column list."""
     bucket = {'profile': [], 'SVC': [], 'YN': [], 'OPEN': []}
     for p in LIKERT_SECTION_MAP:
         bucket[LIKERT_SECTION_MAP[p][0]] = []
@@ -355,6 +340,49 @@ def all_likert_cols(sections):
     for p in ALL_LIKERT_PREFIXES:
         out += sections.get(p, [])
     return out
+
+
+def detect_likert_by_value(df, min_fill=0.85):
+    """Return columns whose non-null numeric values lie within 1-5."""
+    hits = []
+    for c in df.columns:
+        vals = pd.to_numeric(df[c], errors='coerce').dropna()
+        if len(vals) < 10:
+            continue
+        in_range = vals.between(1, 5).mean()
+        distinct = vals.nunique()
+        if in_range >= min_fill and 2 <= distinct <= 6:
+            hits.append(c)
+    return hits
+
+
+def sections_from_value_detection(df, likert_cols):
+    """Split detected Likert columns evenly across the 8 Likert sections."""
+    sections = {'profile': [], 'SVC': [], 'YN': [], 'OPEN': [],
+                'ACC': [], 'EFF': [], 'REL': [], 'QUAL': [],
+                'SD': [], 'RES': [], 'COMM': [], 'TIME': []}
+
+    n = len(likert_cols)
+    if n == 0:
+        return sections
+
+    prefixes = ['ACC', 'EFF', 'REL', 'QUAL', 'SD', 'RES', 'COMM', 'TIME']
+    per = max(1, n // 8)
+
+    for i, prefix in enumerate(prefixes):
+        start = i * per
+        end = (i + 1) * per if i < 7 else n
+        sections[prefix] = likert_cols[start:end]
+
+    for c in df.columns:
+        if c in likert_cols:
+            continue
+        vals = df[c].dropna().astype(str).str.lower().unique()
+        if set(vals).issubset({'yes', 'no', 'y', 'n', 'true', 'false'}):
+            sections['SVC'].append(c)
+        else:
+            sections['profile'].append(c)
+    return sections
 
 
 # ============================================================
@@ -381,12 +409,20 @@ def compute_satisfaction(df, sections):
 
 
 # ============================================================
-# PREPROCESS
+# PREPROCESS  (with value-based fallback)
 # ============================================================
 def preprocess(df):
     sections = get_sections(df)
-
     labels, scores = compute_satisfaction(df, sections)
+
+    fallback_used = False
+    if labels is None or (labels != 'Unknown').sum() < 5:
+        likert_cols = detect_likert_by_value(df)
+        if likert_cols:
+            sections = sections_from_value_detection(df, likert_cols)
+            labels, scores = compute_satisfaction(df, sections)
+            fallback_used = True
+
     if labels is None:
         return None, None, None, None, None, 'No Likert columns detected.'
 
@@ -405,7 +441,6 @@ def preprocess(df):
     feature_cols += sections.get('YN', [])
     for pref in ('SD', 'RES', 'COMM', 'TIME'):
         feature_cols += sections.get(pref, [])
-
     feature_cols = [c for c in dict.fromkeys(feature_cols)
                     if not str(c).startswith('_') and c in df.columns]
 
@@ -426,7 +461,8 @@ def preprocess(df):
             X[c] = X[c].fillna(X[c].median() if X[c].notna().any() else 0)
 
     y = df['_satisfaction'].copy()
-    return X, y, df, feature_cols, scores.loc[df.index].values, None
+    return X, y, df, feature_cols, scores.loc[df.index].values, \
+           ('value-fallback' if fallback_used else None)
 
 
 # ============================================================
@@ -448,10 +484,8 @@ def train_models(X, y, test_size, seed):
     results = {}
     for name, m in models.items():
         m.fit(X_tr_s, y_tr)
-        results[name] = {
-            'model': m, 'y_pred': m.predict(X_te_s),
-            'y_test': y_te, 'X_test': X_te_s,
-        }
+        results[name] = {'model': m, 'y_pred': m.predict(X_te_s),
+                         'y_test': y_te, 'X_test': X_te_s}
     return results, scaler, X_tr, X_te, y_tr, y_te
 
 
@@ -479,9 +513,9 @@ def elbow(X_scaled, max_k):
 
 
 # ============================================================
-# LOAD + PREPROCESS
+# LOAD DATA
 # ============================================================
-df_raw, filename, meta = load_and_clean()
+df_raw, filename, meta, raw_debug = load_and_clean()
 
 st.markdown("""
 <div class="hero">
@@ -491,16 +525,17 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander("Data Loading Report", expanded=False):
+# ---- DATA LOADING REPORT (expanded so issues are visible) ----
+with st.expander("Data Loading Report", expanded=True):
     if df_raw is None:
         st.error("No dataset found. Place the .xlsx / .xls / .csv file in the same folder as app.py.")
     else:
         st.success(f"Loaded: {filename}")
         if meta:
             st.caption(
-                f"Header detected on Excel row {meta['header_row_excel']}"
-                + (f"; section labels from row {meta['section_row_excel']}"
-                   if meta.get('section_row_excel') else "")
+                f"Raw shape: {meta['raw_shape']}  |  "
+                f"Header on Excel row {meta['header_row_excel']}  |  "
+                f"Section labels from row {meta['section_row_excel']}"
             )
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Respondents", f"{df_raw.shape[0]:,}")
@@ -511,23 +546,54 @@ with st.expander("Data Loading Report", expanded=False):
                   df_raw[brgy_col].nunique() if brgy_col else "N/A")
         sections = get_sections(df_raw)
         c4.metric("Likert Items", len(all_likert_cols(sections)))
-        st.write("**Detected columns:**")
+
+        st.write("**Detected columns (all):**")
         st.code(list(df_raw.columns), language=None)
-        with st.expander("First 5 rows"):
-            st.dataframe(df_raw.head(5), use_container_width=True)
+
+        st.write("**First 3 cleaned rows:**")
+        st.dataframe(df_raw.head(3), use_container_width=True)
+
+        if raw_debug is not None:
+            with st.expander("Raw (unprocessed) first 3 rows"):
+                st.write("Column indices are 0-based.")
+                st.dataframe(raw_debug.head(3), use_container_width=True)
 
 if df_raw is None:
     st.stop()
 
-X, y, df_clean, feature_cols, overall_scores, err = preprocess(df_raw)
+# ---- PREPROCESS ----
+X, y, df_clean, feature_cols, overall_scores, prep_note = preprocess(df_raw)
 
-if err:
-    st.error(f"Preprocessing failed: {err}")
+if X is None:
+    st.error(f"Preprocessing failed: {prep_note}")
+
+    st.markdown("### Debug Information")
+    st.write(f"Detected header row (Excel 1-based): "
+             f"**{meta.get('header_row_excel') if meta else 'N/A'}**")
+    st.write(f"Detected section row (Excel 1-based): "
+             f"**{meta.get('section_row_excel') if meta else 'N/A'}**")
+
+    st.write("**Column names as parsed:**")
+    st.code(list(df_raw.columns), language=None)
+
+    likert_by_val = detect_likert_by_value(df_raw)
+    st.write(f"**Likert columns detected by VALUE range (1-5): "
+             f"{len(likert_by_val)}**")
+    if likert_by_val:
+        st.code(likert_by_val)
+
+    st.write("**First 3 rows of the parsed dataframe:**")
+    st.dataframe(df_raw.head(3), use_container_width=True)
+
+    st.info(
+        "If the parsed column names still show section banners like "
+        "'PART I: Respondent Profile' or 'Part II: A. Accessibility...', then the "
+        "header row detection picked the wrong row. Send a screenshot of the "
+        "column list above and I'll tune the detection."
+    )
     st.stop()
 
-# ============================================================
-# SIDEBAR
-# ============================================================
+# ---- SIDEBAR ----
 st.sidebar.markdown("""
 <div style="padding: 8px 0 20px 0;">
     <p class="sidebar-title">Farmer Satisfaction</p>
@@ -551,18 +617,16 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### Configuration")
 st.sidebar.info(f"Respondents: {len(X)}")
 st.sidebar.info(f"Features: {len(feature_cols)}")
+if prep_note == 'value-fallback':
+    st.sidebar.warning("Likert columns were auto-detected by value range (fallback).")
 
 test_size    = st.sidebar.slider("Test size", 0.10, 0.40, 0.20, 0.05)
 random_state = int(st.sidebar.number_input("Random state", value=42, step=1))
 k_clusters   = st.sidebar.slider("K (clusters)", 2, 6, 3)
 cv_folds     = st.sidebar.slider("CV folds", 3, 10, 10)
 
-# ============================================================
-# TRAIN MODELS
-# ============================================================
-results, scaler, X_tr, X_te, y_tr, y_te = train_models(
-    X, y, test_size, random_state
-)
+# ---- TRAIN ----
+results, scaler, X_tr, X_te, y_tr, y_te = train_models(X, y, test_size, random_state)
 metrics_table = pd.DataFrame({
     name: metrics_row(r['y_test'], r['y_pred'])
     for name, r in results.items()
@@ -575,7 +639,7 @@ df_clean['_cluster'] = cluster_labels
 
 
 # ============================================================
-# PAGE: OVERVIEW  (CF Output 1 - Satisfaction Classification)
+# PAGE: OVERVIEW
 # ============================================================
 if page == "Overview":
     st.markdown("## Satisfaction Classification")
@@ -590,10 +654,10 @@ if page == "Overview":
     brgy_count = df_clean['Barangay'].nunique() if 'Barangay' in df_clean.columns else 0
 
     for col, lab, val, sub in [
-        (c1, "Respondents", f"{len(X):,}",                       "After cleaning"),
-        (c2, "Barangays",   f"{brgy_count}",                     "Covered areas"),
-        (c3, "Mean Score",  f"{np.mean(overall_scores):.2f}",    "Scale of 1-5"),
-        (c4, "Silhouette",  f"{sil_score:.3f}",                  f"K = {k_clusters}"),
+        (c1, "Respondents", f"{len(X):,}", "After cleaning"),
+        (c2, "Barangays",   f"{brgy_count}", "Covered areas"),
+        (c3, "Mean Score",  f"{np.mean(overall_scores):.2f}", "Scale of 1-5"),
+        (c4, "Silhouette",  f"{sil_score:.3f}", f"K = {k_clusters}"),
     ]:
         col.markdown(f"""
         <div class="metric-card">
@@ -619,8 +683,7 @@ if page == "Overview":
     with col1:
         fig, ax = plt.subplots(figsize=(6.5, 4.2))
         ax.pie(sat_counts[order].values,
-               labels=order,
-               autopct='%1.1f%%',
+               labels=order, autopct='%1.1f%%',
                colors=[colors[o] for o in order],
                startangle=120,
                wedgeprops={'edgecolor': 'white', 'linewidth': 2})
@@ -632,29 +695,25 @@ if page == "Overview":
         tbl = sat_counts.rename('Count').to_frame()
         tbl['Percentage'] = (tbl['Count'] / tbl['Count'].sum() * 100).round(2)
         st.dataframe(tbl, use_container_width=True)
-
         st.markdown(f"""
         <div class="info-box" style="margin-top:12px;">
         The mean Likert score across all
         <b>{len(all_likert_cols(get_sections(df_clean)))}</b>
         satisfaction and factor items is <b>{np.mean(overall_scores):.2f}</b>.
-        Scores at or above <b>3.41</b> are classified as Satisfied or above,
-        following the standard five-point Likert interpretation scale.
+        Scores at or above <b>3.41</b> are classified as Satisfied or above.
         </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<div class='section-header'>Model Performance (Hold-out Test Set)</div>",
                 unsafe_allow_html=True)
     st.dataframe(
-        metrics_table.style
-            .format("{:.4f}")
-            .highlight_max(axis=0, color='#fed7aa'),
+        metrics_table.style.format("{:.4f}").highlight_max(axis=0, color='#fed7aa'),
         use_container_width=True,
     )
 
 
 # ============================================================
-# PAGE: DATA EXPLORER  (§3.5 Preprocessing evidence)
+# PAGE: DATA EXPLORER
 # ============================================================
 elif page == "Data Explorer":
     st.markdown("## Data Explorer")
@@ -700,14 +759,14 @@ elif page == "Data Explorer":
 
 
 # ============================================================
-# PAGE: PATTERNS & TRENDS  (CF Output 2 - Part 1)
+# PAGE: PATTERNS & TRENDS
 # ============================================================
 elif page == "Patterns & Trends":
     st.markdown("## Patterns and Trends")
     st.markdown(
         "<p style='color:#78716c; margin-top:-8px;'>"
         "Descriptive analysis of respondent profile, service access, and "
-        "per-item Likert means to reveal recurring patterns and service-related issues.</p>",
+        "per-item Likert means.</p>",
         unsafe_allow_html=True,
     )
 
@@ -798,24 +857,20 @@ elif page == "Patterns & Trends":
 
 
 # ============================================================
-# PAGE: CLASSIFICATION  (§3.7 - DT + NB)
+# PAGE: CLASSIFICATION
 # ============================================================
 elif page == "Classification":
     st.markdown("## Classification Analysis")
     st.markdown(
         "<p style='color:#78716c; margin-top:-8px;'>"
-        "Decision Tree and Naive Bayes models predicting satisfaction level "
-        "from profile, service access, and the factor Likert sections "
-        "(SD, RES, COMM, TIME).</p>",
+        "Decision Tree and Naive Bayes predicting satisfaction level.</p>",
         unsafe_allow_html=True,
     )
 
     st.markdown("<div class='section-header'>Hold-out Test Set Performance</div>",
                 unsafe_allow_html=True)
     st.dataframe(
-        metrics_table.style
-            .format("{:.4f}")
-            .highlight_max(axis=0, color='#fed7aa'),
+        metrics_table.style.format("{:.4f}").highlight_max(axis=0, color='#fed7aa'),
         use_container_width=True,
     )
 
@@ -875,14 +930,13 @@ elif page == "Classification":
 
 
 # ============================================================
-# PAGE: CLUSTERING  (§3.7 - K-Means)
+# PAGE: CLUSTERING
 # ============================================================
 elif page == "Clustering":
     st.markdown("## K-Means Clustering")
     st.markdown(
         "<p style='color:#78716c; margin-top:-8px;'>"
-        "Unsupervised grouping of respondents based on similarity in profile, "
-        "support received, and factor Likert scores.</p>",
+        "Unsupervised grouping of respondents based on similarity.</p>",
         unsafe_allow_html=True,
     )
 
@@ -950,22 +1004,15 @@ elif page == "Clustering":
                 st.markdown("**Satisfaction Levels**")
                 st.dataframe(sub['_satisfaction'].value_counts(),
                              use_container_width=True)
-
             sub_mean = pd.to_numeric(sub['_score'], errors='coerce').mean()
             st.markdown(f"**Mean satisfaction score:** {sub_mean:.2f}")
 
 
 # ============================================================
-# PAGE: KEY FACTORS  (CF Output 3)
+# PAGE: KEY FACTORS
 # ============================================================
 elif page == "Key Factors":
     st.markdown("## Key Factors Affecting Satisfaction")
-    st.markdown(
-        "<p style='color:#78716c; margin-top:-8px;'>"
-        "Factors derived from Decision Tree feature importance, section-level "
-        "score comparison, and correlation analysis.</p>",
-        unsafe_allow_html=True,
-    )
 
     st.markdown("<div class='section-header'>Top Decision-Tree Feature Importances</div>",
                 unsafe_allow_html=True)
@@ -998,19 +1045,11 @@ elif page == "Key Factors":
         sm['_label'] = y.values
         group = sm.groupby('_label').mean().round(3)
         st.dataframe(group, use_container_width=True)
-        st.markdown("""
-        <div class="info-box" style="margin-top:12px;">
-        Rows are the satisfaction levels, columns are the section mean scores.
-        A well-separated table (each row distinct) suggests that section-level
-        scores are strong discriminators of overall satisfaction.
-        </div>
-        """, unsafe_allow_html=True)
 
-    st.markdown("<div class='section-header'>Correlation of Factor Likert Items with Overall Score</div>",
+    st.markdown("<div class='section-header'>Correlation with Overall Score</div>",
                 unsafe_allow_html=True)
-    factor_prefixes = ('SD', 'RES', 'COMM', 'TIME')
     factor_cols = []
-    for p in factor_prefixes:
+    for p in ('SD', 'RES', 'COMM', 'TIME'):
         factor_cols += sections.get(p, [])
     if factor_cols:
         corr_df = df_clean[factor_cols].apply(pd.to_numeric, errors='coerce')
@@ -1032,17 +1071,10 @@ elif page == "Key Factors":
 
 
 # ============================================================
-# PAGE: CROSS-VALIDATION  (§3.8 - 10-fold CV)
+# PAGE: CROSS-VALIDATION
 # ============================================================
 elif page == "Cross-Validation":
     st.markdown(f"## {cv_folds}-Fold Cross-Validation")
-    st.markdown(
-        "<p style='color:#78716c; margin-top:-8px;'>"
-        "Each algorithm is trained on K-1 folds and validated on the remaining "
-        "fold. The procedure is repeated until every fold has served as the "
-        "validation set once (Chapter 3.8).</p>",
-        unsafe_allow_html=True,
-    )
 
     cv = StratifiedKFold(n_splits=cv_folds, shuffle=True, random_state=42)
     cv_models = {
