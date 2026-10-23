@@ -1262,14 +1262,16 @@ with tab_obj5:
     proba_all = best_model.predict_proba(X_scaled_all)
     classes = list(best_model.classes_)
     
-    # Define risk as 1 minus the probability of being the highest satisfaction class
-    # This is a standard risk metric when "Dissatisfied" classes are absent
-    highly_idx = [i for i, c in enumerate(classes) if c == "Highly Satisfied"]
-    if highly_idx:
-        risk_prob = 1.0 - proba_all[:, highly_idx[0]]
+    # Define risk as the probability of being in the lowest available class
+    # Since "Dissatisfied" does not exist in the dataset, "Moderately Satisfied" is the lowest tier.
+    if "Moderately Satisfied" in classes:
+        risk_idx = classes.index("Moderately Satisfied")
     else:
-        risk_prob = 1.0 - np.max(proba_all, axis=1) # Fallback if Highly Satisfied is missing
+        # Fallback if the class name is slightly different
+        risk_idx = np.argmin(np.mean(proba_all, axis=0))
         
+    risk_prob = proba_all[:, risk_idx]
+    
     risk_df = df_clean.copy()
     risk_df["_risk"] = risk_prob
     risk_by_brgy = (risk_df.groupby("Barangay")["_risk"]
@@ -1281,11 +1283,11 @@ with tab_obj5:
         risk_by_brgy = risk_by_brgy.loc[[focus_barangay]]
         
     fig, ax = plt.subplots(figsize=(9, max(3.2, len(risk_by_brgy) * 0.34)))
-    # Color logic: High risk is red, low risk is green
+    # Red for high risk, yellow for medium, teal for low
     bar_colors = ["#8a4420" if v >= 0.5 else "#b8860b" if v >= 0.25 else "#0e7490"
                   for v in risk_by_brgy["Mean Risk"]]
     ax.barh(risk_by_brgy.index, risk_by_brgy["Mean Risk"], color=bar_colors, alpha=0.9)
-    ax.set_xlabel("Mean Predicted Probability of Dissatisfaction (Risk)")
+    ax.set_xlabel("Mean Predicted Probability of 'Moderately Satisfied' (Risk)")
     ax.set_xlim(0, 1.05)
     ax.grid(axis="x", alpha=0.25)
     for s in ("top", "right"):
@@ -1296,11 +1298,10 @@ with tab_obj5:
     
     top_risk = risk_by_brgy.tail(3).index.tolist()[::-1]
     _interp(
-        f"Using the {best_name} model, the barangays with the highest mean predicted dissatisfaction "
-        f"risk are {', '.join(top_risk)}. These are the top-priority areas for immediate service "
-        f"intervention and resource realignment."
+        f"Using the {best_name} model, the barangays with the highest mean predicted probability "
+        f"of falling into the 'Moderately Satisfied' category are {', '.join(top_risk)}. "
+        f"These are the top-priority areas for immediate service intervention."
     )
-
     st.markdown("<div class='section-header'>Record-Level Predictions (Downloadable)</div>",
                 unsafe_allow_html=True)
     pred_df = df_clean[["Barangay", "Sex", "Age"]].copy() if {"Barangay", "Sex", "Age"}.issubset(df_clean.columns) else df_clean[["Barangay"]].copy()
