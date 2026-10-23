@@ -1261,31 +1261,39 @@ with tab_obj5:
     X_scaled_all = StandardScaler().fit_transform(X)
     proba_all = best_model.predict_proba(X_scaled_all)
     classes = list(best_model.classes_)
-    risk_classes = {"Dissatisfied", "Very Dissatisfied"}
-    risk_idx = [i for i, c in enumerate(classes) if c in risk_classes]
-    if not risk_idx:
-        risk_idx = [0]
-    risk_prob = proba_all[:, risk_idx].sum(axis=1)
+    
+    # Define risk as 1 minus the probability of being the highest satisfaction class
+    # This is a standard risk metric when "Dissatisfied" classes are absent
+    highly_idx = [i for i, c in enumerate(classes) if c == "Highly Satisfied"]
+    if highly_idx:
+        risk_prob = 1.0 - proba_all[:, highly_idx[0]]
+    else:
+        risk_prob = 1.0 - np.max(proba_all, axis=1) # Fallback if Highly Satisfied is missing
+        
     risk_df = df_clean.copy()
     risk_df["_risk"] = risk_prob
     risk_by_brgy = (risk_df.groupby("Barangay")["_risk"]
                     .agg(["mean", "count"]).rename(
                         columns={"mean": "Mean Risk", "count": "Respondents"})
                     .sort_values("Mean Risk", ascending=True))
+                    
     if focus_barangay != "All Barangays" and focus_barangay in risk_by_brgy.index:
         risk_by_brgy = risk_by_brgy.loc[[focus_barangay]]
+        
     fig, ax = plt.subplots(figsize=(9, max(3.2, len(risk_by_brgy) * 0.34)))
-    bar_colors = ["#8a4420" if v >= 0.5 else "#b8860b" if v >= 0.25 else "#7c2d3a"
+    # Color logic: High risk is red, low risk is green
+    bar_colors = ["#8a4420" if v >= 0.5 else "#b8860b" if v >= 0.25 else "#0e7490"
                   for v in risk_by_brgy["Mean Risk"]]
     ax.barh(risk_by_brgy.index, risk_by_brgy["Mean Risk"], color=bar_colors, alpha=0.9)
-    ax.set_xlabel("Mean Predicted Probability of Dissatisfaction")
-    ax.set_xlim(0, 1)
+    ax.set_xlabel("Mean Predicted Probability of Dissatisfaction (Risk)")
+    ax.set_xlim(0, 1.05)
     ax.grid(axis="x", alpha=0.25)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     plt.tight_layout()
     st.pyplot(fig)
     plt.close()
+    
     top_risk = risk_by_brgy.tail(3).index.tolist()[::-1]
     _interp(
         f"Using the {best_name} model, the barangays with the highest mean predicted dissatisfaction "
