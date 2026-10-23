@@ -35,136 +35,235 @@ st.set_page_config(page_title="Farmers' Satisfaction Dashboard", layout="wide",
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
 
-html, body, [class*="css"], .stApp p, .stApp li, .stApp span {
-    font-family: 'Manrope', system-ui, sans-serif;
-    font-size: 1.02rem;
-    letter-spacing: -0.005em;
+:root {
+    --brand-primary: #7c2d3a;
+    --brand-primary-dark: #4a1822;
+    --brand-primary-light: #a14053;
+    --brand-accent: #b8860b;
+    --brand-bg: #faf7f2;
+    --brand-surface: #ffffff;
+    --brand-surface-alt: #f5efe6;
+    --brand-text: #1c1917;
+    --brand-muted: #78716c;
+    --brand-border: #e7e0d5;
 }
-.stApp { background: #f0f4f8; }
-.block-container { padding-top: 1.3rem; padding-bottom: 2.8rem; max-width: 1500px; }
 
-[data-testid="stSidebar"] { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); border-right: 1px solid #334155; }
-[data-testid="stSidebar"] * { color: #e2e8f0 !important; font-family: 'Manrope', sans-serif; }
+html, body, .stApp {
+    font-family: 'Manrope', system-ui, sans-serif !important;
+    background: var(--brand-bg) !important;
+    color: var(--brand-text) !important;
+}
+[data-testid="stAppViewContainer"] {
+    background: var(--brand-bg) !important;
+}
+[data-testid="stHeader"] { background: transparent !important; }
+[data-testid="stToolbar"] { background: transparent !important; }
+[data-testid="stDecoration"] { display: none !important; }
+
+.stApp p, .stApp li, .stApp label, .stApp span, .stApp div,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stWidgetLabel"] *,
+[data-testid="stCaptionContainer"] * {
+    font-family: 'Manrope', system-ui, sans-serif !important;
+    font-size: 1.05rem !important;
+    color: var(--brand-text);
+}
+
+.stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4,
+[data-testid="stHeading"] h1,
+[data-testid="stHeading"] h2,
+[data-testid="stHeading"] h3 {
+    font-family: 'Fraunces', 'Playfair Display', 'Merriweather', Georgia, serif !important;
+    color: var(--brand-text) !important;
+    letter-spacing: -0.018em !important;
+}
+.stApp h2 { font-size: 1.65rem !important; font-weight: 700 !important; }
+.stApp h3 { font-size: 1.35rem !important; font-weight: 700 !important; }
+
+.block-container { padding-top: 1.3rem !important; padding-bottom: 2.8rem !important; max-width: 1500px; }
+
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #2a0f16 0%, #4a1822 100%) !important;
+    border-right: 1px solid #5a2230 !important;
+}
+[data-testid="stSidebar"] * {
+    color: #f5efe6 !important;
+    font-family: 'Manrope', system-ui, sans-serif !important;
+}
+[data-testid="stSidebar"] .stFileUploader label,
 [data-testid="stSidebar"] .stCheckbox label span,
-[data-testid="stSidebar"] .stSelectbox label { color: #cbd5e1 !important; font-size: 0.95rem; font-weight: 500; }
-[data-testid="stSidebar"] .stFileUploader label { font-size: 0.95rem; }
-[data-testid="stSidebar"] hr { border-color: #334155; }
-
-h1, h2, h3, h4 {
-    font-family: 'Fraunces', Georgia, serif;
-    color: #0f172a;
-    font-weight: 700;
-    letter-spacing: -0.015em;
-    font-variation-settings: "opsz" 48;
+[data-testid="stSidebar"] .stSelectbox label,
+[data-testid="stSidebar"] .stSlider label {
+    color: #e7d9c5 !important;
+    font-size: 0.98rem !important;
+    font-weight: 600 !important;
 }
-h2 { font-size: 1.6rem; }
-h3 { font-size: 1.3rem; }
+[data-testid="stSidebar"] hr { border-color: #5a2230 !important; }
 
 .hero {
-    background: linear-gradient(135deg, #0e7490 0%, #0891b2 60%, #06b6d4 100%);
-    border-radius: 16px; padding: 30px 34px; color: #ffffff; margin-bottom: 22px;
-    box-shadow: 0 12px 26px -10px rgba(14, 116, 144, 0.5);
+    background: linear-gradient(135deg, #4a1822 0%, #7c2d3a 55%, #a14053 100%);
+    border-radius: 16px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 14px 30px -10px rgba(74, 24, 34, 0.55);
 }
 .hero h1 {
-    font-family: 'Fraunces', Georgia, serif;
-    font-variation-settings: "opsz" 96;
-    color: #ffffff; margin: 0 0 8px 0;
-    font-size: 2.05rem; font-weight: 800; letter-spacing: -0.025em;
-    line-height: 1.15;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif !important;
+    color: #ffffff !important;
+    font-size: 2.25rem !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+    letter-spacing: -0.025em !important;
+    margin: 0 0 10px 0 !important;
 }
 .hero p {
-    color: #cffafe; margin: 0;
-    font-size: 1.02rem;
-    font-family: 'Manrope', sans-serif;
+    color: #f5e6cc !important;
+    font-family: 'Manrope', system-ui, sans-serif !important;
+    font-size: 1.05rem !important;
+    margin: 0 !important;
 }
-.hero p:last-child { letter-spacing: 0.02em; text-transform: uppercase; font-size: 0.88rem; }
+.hero p:last-child {
+    color: #e7c88a !important;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.88rem !important;
+    margin-top: 10px !important;
+    font-weight: 600 !important;
+}
 
 .metric-card {
-    background: #ffffff; border-radius: 12px; padding: 18px 20px;
-    border: 1px solid #e2e8f0; border-top: 3px solid #0e7490;
-    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06); height: 100%;
+    background: var(--brand-surface);
+    border-radius: 12px;
+    padding: 20px 22px;
+    border: 1px solid var(--brand-border);
+    border-top: 3px solid var(--brand-primary);
+    box-shadow: 0 2px 6px rgba(28, 25, 23, 0.05);
+    height: 100%;
 }
 .metric-label {
-    color: #64748b; font-size: 0.8rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.1em;
-    font-family: 'Manrope', sans-serif;
+    color: var(--brand-muted) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 .metric-value {
-    color: #0f172a;
-    font-family: 'Fraunces', Georgia, serif;
-    font-variation-settings: "opsz" 96;
-    font-size: 2.3rem; font-weight: 800; margin-top: 8px; line-height: 1.05;
+    color: var(--brand-primary-dark) !important;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif !important;
+    font-size: 2.5rem !important;
+    font-weight: 800 !important;
+    margin-top: 8px;
+    line-height: 1.05;
     font-feature-settings: "tnum" 1;
 }
 .metric-sub {
-    color: #0e7490; font-size: 0.88rem; font-weight: 600; margin-top: 8px;
-    font-family: 'Manrope', sans-serif;
+    color: var(--brand-primary) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    margin-top: 8px;
 }
 
 .section-header {
-    color: #0f172a;
-    font-family: 'Fraunces', Georgia, serif;
-    font-variation-settings: "opsz" 48;
-    font-size: 1.3rem; font-weight: 700;
-    border-left: 4px solid #0e7490;
-    padding-left: 14px; margin: 26px 0 14px 0;
-    letter-spacing: -0.01em;
+    color: var(--brand-primary-dark) !important;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif !important;
+    font-size: 1.42rem !important;
+    font-weight: 700 !important;
+    border-left: 4px solid var(--brand-accent);
+    padding-left: 14px;
+    margin: 28px 0 14px 0;
+    letter-spacing: -0.012em;
 }
 
 .info-box {
-    background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 10px;
-    padding: 15px 18px; color: #155e75;
-    font-size: 0.98rem; line-height: 1.7; margin-top: 12px;
-    font-family: 'Manrope', sans-serif;
+    background: #fdf6e8;
+    border: 1px solid #e8d4a8;
+    border-left: 4px solid var(--brand-accent);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: #5a3a0a !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 1.0rem !important;
+    line-height: 1.7;
+    margin-top: 12px;
 }
 .warn-box {
-    background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px;
-    padding: 15px 18px; color: #78350f;
-    font-size: 0.98rem; line-height: 1.7; margin-top: 12px;
-    font-family: 'Manrope', sans-serif;
+    background: #fbeee0;
+    border: 1px solid #e0b48a;
+    border-left: 4px solid #b45309;
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: #6b2f0a !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 1.0rem !important;
+    line-height: 1.7;
+    margin-top: 12px;
 }
 .justify-box {
-    background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px;
-    padding: 16px 20px; color: #1e293b;
-    font-size: 0.98rem; line-height: 1.75;
-    font-family: 'Manrope', sans-serif;
+    background: var(--brand-surface-alt);
+    border: 1px solid var(--brand-border);
+    border-left: 4px solid var(--brand-primary);
+    border-radius: 10px;
+    padding: 18px 22px;
+    color: var(--brand-text) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 1.0rem !important;
+    line-height: 1.75;
 }
-.justify-box b { color: #0e7490; font-weight: 700; }
+.justify-box b, .justify-box strong {
+    color: var(--brand-primary) !important;
+    font-weight: 800 !important;
+}
 
 .sidebar-title {
-    color: #22d3ee; margin: 0;
-    font-family: 'Fraunces', Georgia, serif;
-    font-variation-settings: "opsz" 48;
-    font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em;
+    color: #e7c88a !important;
+    margin: 0;
+    font-family: 'Fraunces', 'Playfair Display', Georgia, serif !important;
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em;
 }
 .sidebar-sub {
-    color: #94a3b8; font-size: 0.85rem; margin-top: 4px;
-    font-family: 'Manrope', sans-serif;
+    color: #c4a883 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.88rem !important;
+    margin-top: 4px;
 }
 
 [data-baseweb="tab-list"] {
-    gap: 10px; background: transparent;
-    border-bottom: none !important; padding-bottom: 12px;
+    gap: 10px;
+    background: transparent !important;
+    border-bottom: none !important;
+    padding-bottom: 12px;
 }
 [data-baseweb="tab"] {
-    background-color: #ffffff !important;
-    border: 2px solid #cbd5e1 !important;
+    background-color: var(--brand-surface) !important;
+    border: 2px solid var(--brand-border) !important;
     border-radius: 9px !important;
     padding: 12px 18px !important;
-    color: #334155 !important;
-    font-weight: 700 !important;
+    color: var(--brand-text) !important;
     font-family: 'Manrope', sans-serif !important;
-    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    font-size: 0.98rem !important;
     letter-spacing: -0.005em !important;
     height: auto !important;
 }
 [data-baseweb="tab"][aria-selected="true"] {
-    background-color: #0e7490 !important;
-    border-color: #0e7490 !important;
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px -4px rgba(14, 116, 144, 0.5);
+    box-shadow: 0 4px 14px -4px rgba(124, 45, 58, 0.5);
+}
+[data-baseweb="tab"][aria-selected="true"] p,
+[data-baseweb="tab"][aria-selected="true"] span {
+    color: #ffffff !important;
 }
 [data-baseweb="tab-highlight"] { display: none !important; }
 [data-baseweb="tab-border"]    { display: none !important; }
@@ -172,18 +271,44 @@ h3 { font-size: 1.3rem; }
 [data-testid="stDataFrame"] *,
 [data-testid="stTable"] * {
     font-family: 'Manrope', sans-serif !important;
-    font-size: 0.92rem !important;
-}
-[data-testid="stMetricLabel"] * { font-size: 0.95rem !important; font-weight: 600 !important; }
-[data-testid="stMetricValue"] * { font-family: 'Fraunces', Georgia, serif !important; font-size: 1.9rem !important; }
-.stButton > button, .stDownloadButton > button {
-    font-family: 'Manrope', sans-serif !important;
     font-size: 0.95rem !important;
+}
+[data-testid="stMetricLabel"] * { font-size: 0.98rem !important; font-weight: 600 !important; }
+[data-testid="stMetricValue"] * {
+    font-family: 'Fraunces', Georgia, serif !important;
+    font-size: 2.0rem !important;
+    color: var(--brand-primary-dark) !important;
+}
+
+.stButton > button,
+.stDownloadButton > button {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 1.0rem !important;
     font-weight: 700 !important;
     border-radius: 8px !important;
+    background: var(--brand-primary) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--brand-primary-dark) !important;
+}
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+    background: var(--brand-primary-dark) !important;
+}
+
+.stAlert { font-family: 'Manrope', sans-serif !important; font-size: 1.0rem !important; }
+
+[data-baseweb="select"] > div,
+[data-baseweb="input"] > div,
+.stTextInput input,
+.stNumberInput input {
+    background: #ffffff !important;
+    border-color: var(--brand-border) !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 1.0rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
+
 VALID_BARANGAYS = {
     "Batucan", "Zillovia", "Labnig", "Causwagan", "Buena Gracia",
     "Marbon", "Del Monte", "San Agustin", "San Isidro", "La Flora",
@@ -228,10 +353,11 @@ ALL_LIKERT_PREFIXES = ("ACC", "EFF", "REL", "QUAL", "SD", "RES", "COMM", "TIME")
 SATISFACTION_ORDER = ["Highly Satisfied", "Satisfied", "Moderately Satisfied",
                      "Dissatisfied", "Very Dissatisfied"]
 SATISFACTION_COLORS = {
-    "Highly Satisfied": "#0e7490", "Satisfied": "#0891b2",
-    "Moderately Satisfied": "#22d3ee", "Dissatisfied": "#f59e0b",
-    "Very Dissatisfied": "#b45309",
+    "Highly Satisfied": "#7c2d3a", "Satisfied": "#a14053",
+    "Moderately Satisfied": "#b8860b", "Dissatisfied": "#c97b3a",
+    "Very Dissatisfied": "#8a4420",
 }
+
 
 def _clean_text(v):
     if pd.isna(v):
@@ -242,6 +368,7 @@ def _clean_text(v):
     if s == "" or s.lower() in {"nan", "none", "n/a", "/", "-"}:
         return None
     return s
+
 
 def _to_numeric(v):
     if pd.isna(v):
@@ -255,6 +382,7 @@ def _to_numeric(v):
         return float(s)
     except ValueError:
         return np.nan
+
 
 def _detect_header_row(raw, scan_rows=8, min_fill=0.5):
     ncols = raw.shape[1]
@@ -272,6 +400,7 @@ def _detect_header_row(raw, scan_rows=8, min_fill=0.5):
             best_idx = i
     return best_idx
 
+
 def _classify_section(sec_text):
     if not sec_text:
         return None
@@ -288,6 +417,7 @@ def _classify_section(sec_text):
         if key in s:
             return prefix
     return None
+
 
 def _build_clean_columns(section_row, question_row):
     counters, seen, out = {}, {}, []
@@ -320,6 +450,7 @@ def _build_clean_columns(section_row, question_row):
         out.append(name)
     return out
 
+
 def _parse_raw_frame(raw):
     header_idx = _detect_header_row(raw)
     section_idx = header_idx - 1 if header_idx > 0 else None
@@ -331,6 +462,7 @@ def _parse_raw_frame(raw):
     data.columns = clean_cols
     data = data.dropna(axis=0, how="all").dropna(axis=1, how="all")
     return data
+
 
 def _normalize_categoricals(df):
     spell = {
@@ -358,6 +490,7 @@ def _normalize_categoricals(df):
         df["Barangay"] = df["Barangay"].apply(_fix_brgy)
     return df
 
+
 def _clean_dataframe(df):
     for c in df.columns:
         if df[c].dtype == "object":
@@ -372,6 +505,7 @@ def _clean_dataframe(df):
                                "no": "No", "y": "Yes", "n": "No"}))
     df = _normalize_categoricals(df)
     return df.reset_index(drop=True)
+
 
 def _find_example_file():
     candidates = []
@@ -388,6 +522,7 @@ def _find_example_file():
     pool = preferred or responses or candidates
     return pool[0]
 
+
 def _read_raw(path_or_buffer, is_upload=True):
     name = getattr(path_or_buffer, "name", str(path_or_buffer))
     if str(name).lower().endswith(".csv"):
@@ -398,6 +533,7 @@ def _read_raw(path_or_buffer, is_upload=True):
                 continue
         return pd.read_csv(path_or_buffer, header=None, encoding="latin-1")
     return pd.read_excel(path_or_buffer, header=None, sheet_name=0)
+
 
 def load_and_prepare(raw):
     stats = {"raw": 0, "duplicates": 0, "missing_dropped": 0,
@@ -434,6 +570,7 @@ def load_and_prepare(raw):
     stats["final"] = int(len(data))
     return data, stats
 
+
 def get_sections(df):
     bucket = {"profile": [], "SVC": [], "YN": [], "OPEN": []}
     for p in LIKERT_SECTION_MAP:
@@ -445,6 +582,7 @@ def get_sections(df):
         else:
             bucket["profile"].append(c)
     return bucket
+
 
 def classify_score(score):
     if pd.isna(score):
@@ -459,6 +597,7 @@ def classify_score(score):
         return "Dissatisfied"
     return "Very Dissatisfied"
 
+
 def compute_satisfaction(df, sections):
     label_cols = []
     for pref in LABEL_SECTIONS:
@@ -468,6 +607,7 @@ def compute_satisfaction(df, sections):
     numeric = df[label_cols].apply(pd.to_numeric, errors="coerce")
     score = numeric.mean(axis=1, skipna=True)
     return score.apply(classify_score), score
+
 
 def preprocess(df):
     sections = get_sections(df)
@@ -528,6 +668,7 @@ def preprocess(df):
     y = df["_satisfaction"].copy()
     return X, y, df, feature_cols, scores.loc[df.index].values, None
 
+
 def train_models(X, y, test_size, seed):
     X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=test_size,
                                               random_state=seed, stratify=y)
@@ -546,6 +687,7 @@ def train_models(X, y, test_size, seed):
                          "y_proba": m.predict_proba(X_te_s)}
     return results, scaler
 
+
 def metrics_row(y_t, y_p):
     return {
         "Accuracy": accuracy_score(y_t, y_p),
@@ -554,6 +696,7 @@ def metrics_row(y_t, y_p):
         "F1-Score": f1_score(y_t, y_p, average="weighted", zero_division=0),
     }
 
+
 def _kpi(col, label, value, sub=""):
     sub_html = f'<div class="metric-sub">{sub}</div>' if sub else ""
     col.markdown(
@@ -561,14 +704,18 @@ def _kpi(col, label, value, sub=""):
         f'<div class="metric-value">{value}</div>{sub_html}</div>',
         unsafe_allow_html=True)
 
+
 def _interp(text):
     st.markdown(f'<div class="info-box">{text}</div>', unsafe_allow_html=True)
+
 
 def _warn(text):
     st.markdown(f'<div class="warn-box">{text}</div>', unsafe_allow_html=True)
 
+
 def _justify(text):
     st.markdown(f'<div class="justify-box">{text}</div>', unsafe_allow_html=True)
+
 
 st.sidebar.markdown("""
 <div style="padding: 8px 0 18px 0;">
@@ -647,7 +794,7 @@ st.markdown("""
 <div class="hero">
     <h1>Data Mining Analysis of Farmers' Satisfaction with Agricultural Support Services</h1>
     <p>Municipality of Talacogon, Agusan del Sur &mdash; Classification and Clustering Evidence Base</p>
-    <p style="margin-top:6px; color:#a5f3fc;">Decision Tree &middot; Naive Bayes &middot; K-Means</p>
+    <p>Decision Tree &middot; Naive Bayes &middot; K-Means</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -730,11 +877,11 @@ with tab_obj1:
             dim_labels.append(label)
     if dim_means:
         fig, ax = plt.subplots(figsize=(10, 4.2))
-        bar_colors = ["#0e7490" if v >= 3.41 else "#f59e0b" if v >= 2.61 else "#b45309"
+        bar_colors = ["#7c2d3a" if v >= 3.41 else "#b8860b" if v >= 2.61 else "#8a4420"
                       for v in dim_means]
         ax.barh(dim_labels, dim_means, color=bar_colors, alpha=0.92)
-        ax.axvline(3.41, color="#0891b2", linestyle="--", linewidth=1, label="Satisfied (3.41)")
-        ax.axvline(2.61, color="#f59e0b", linestyle="--", linewidth=1, label="Moderately (2.61)")
+        ax.axvline(3.41, color="#a14053", linestyle="--", linewidth=1, label="Satisfied (3.41)")
+        ax.axvline(2.61, color="#b8860b", linestyle="--", linewidth=1, label="Moderately (2.61)")
         ax.set_xlim(1, 5)
         ax.set_xlabel("Mean Score (1-5)")
         ax.legend(loc="lower right", fontsize=8)
@@ -757,7 +904,7 @@ with tab_obj1:
                .sort_values("Mean Score", ascending=True))
     if len(ranking) > 1:
         fig, ax = plt.subplots(figsize=(9, max(3.2, len(ranking) * 0.32)))
-        colors_rank = ["#0e7490" if v >= 3.41 else "#f59e0b" if v >= 2.61 else "#b45309"
+        colors_rank = ["#7c2d3a" if v >= 3.41 else "#b8860b" if v >= 2.61 else "#8a4420"
                        for v in ranking["Mean Score"]]
         ax.barh(ranking.index, ranking["Mean Score"], color=colors_rank, alpha=0.9)
         ax.set_xlabel("Mean Satisfaction Score (1-5)")
@@ -792,12 +939,12 @@ with tab_obj1:
                 map_df, lat="lat", lon="lon", hover_name="Barangay",
                 hover_data={"Mean Score": ":.2f", "Respondents": True, "lat": False, "lon": False},
                 color="Mean Score", size="Respondents", size_max=36,
-                color_continuous_scale="Teal", zoom=9.6, height=460)
+                color_continuous_scale="YlOrRd", zoom=9.6, height=460)
             fig_map.update_layout(mapbox_style="open-street-map",
                                   margin=dict(l=0, r=0, t=0, b=0))
             st.plotly_chart(fig_map, use_container_width=True)
             _interp(
-                "Darker teal markers indicate higher mean satisfaction; larger markers indicate more "
+                "Darker markers indicate higher mean satisfaction; larger markers indicate more "
                 "respondents. Spatial clustering of low-satisfaction barangays highlights areas where "
                 "resource reallocation is most urgent."
             )
@@ -831,7 +978,7 @@ with tab_obj2:
         corr_df["_overall"] = view_df["_score"].values
         corr_matrix = corr_df.corr()
         fig, ax = plt.subplots(figsize=(9, 7))
-        sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="YlGnBu",
+        sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="YlOrBr",
                     center=0, square=True, cbar_kws={"shrink": 0.75},
                     annot_kws={"fontsize": 8}, ax=ax)
         plt.tight_layout()
@@ -851,7 +998,7 @@ with tab_obj2:
     imp = pd.Series(dt_model.feature_importances_, index=feature_cols)
     imp = imp.sort_values(ascending=False).head(15)
     fig, ax = plt.subplots(figsize=(10, max(3.5, len(imp) * 0.35)))
-    ax.barh(imp.index[::-1], imp.values[::-1], color="#0e7490", alpha=0.9)
+    ax.barh(imp.index[::-1], imp.values[::-1], color="#7c2d3a", alpha=0.9)
     ax.set_xlabel("Relative Importance")
     ax.grid(axis="x", alpha=0.25)
     for s in ("top", "right"):
@@ -889,7 +1036,7 @@ with tab_obj3:
     Xp = pca.fit_transform(X_scaled_full)
     fig, ax = plt.subplots(figsize=(10, 5.2))
     scatter = ax.scatter(Xp[:, 0], Xp[:, 1], c=cluster_labels_full,
-                         cmap="viridis", s=55, alpha=0.85,
+                         cmap="YlOrBr", s=55, alpha=0.85,
                          edgecolors="white", linewidths=0.8)
     plt.colorbar(scatter, label="Cluster", ax=ax)
     ax.set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
@@ -937,7 +1084,7 @@ with tab_obj3:
 with tab_obj4:
     st.markdown("<div class='section-header'>Hold-out Test Set Performance</div>",
                 unsafe_allow_html=True)
-    st.dataframe(metrics_table.style.format("{:.4f}").highlight_max(axis=0, color="#a5f3fc"),
+    st.dataframe(metrics_table.style.format("{:.4f}").highlight_max(axis=0, color="#f0d4c0"),
                  use_container_width=True)
     best_name = metrics_table["F1-Score"].idxmax()
     _interp(
@@ -961,7 +1108,7 @@ with tab_obj4:
             labels_order = sorted(y.unique())
             cm = confusion_matrix(res["y_test"], res["y_pred"], labels=labels_order)
             fig, ax = plt.subplots(figsize=(5.6, 4.6))
-            sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            sns.heatmap(cm, annot=True, fmt="d", cmap="OrRd",
                         xticklabels=labels_order, yticklabels=labels_order,
                         cbar=False, ax=ax, annot_kws={"fontsize": 9})
             plt.xticks(rotation=30, ha="right", fontsize=8)
@@ -982,9 +1129,9 @@ with tab_obj4:
                 fpr_micro, tpr_micro, _ = roc_curve(y_bin.ravel(), proba.ravel())
                 auc_micro = auc(fpr_micro, tpr_micro)
                 fig_roc, ax_roc = plt.subplots(figsize=(5.6, 4.4))
-                ax_roc.plot(fpr_micro, tpr_micro, color="#0e7490", lw=2,
+                ax_roc.plot(fpr_micro, tpr_micro, color="#7c2d3a", lw=2,
                             label=f"Micro-average ROC (AUC = {auc_micro:.3f})")
-                ax_roc.plot([0, 1], [0, 1], color="#94a3b8", lw=1, linestyle="--")
+                ax_roc.plot([0, 1], [0, 1], color="#a8a29e", lw=1, linestyle="--")
                 ax_roc.set_xlabel("False Positive Rate")
                 ax_roc.set_ylabel("True Positive Rate")
                 ax_roc.set_title(f"{name} — ROC Curve")
@@ -1018,7 +1165,7 @@ with tab_obj4:
             "Std Dev (Accuracy)": res["test_accuracy"].std(),
         }
     summary_df = pd.DataFrame(summary_data).T.round(4)
-    st.dataframe(summary_df.style.format("{:.4f}").highlight_max(axis=0, color="#a5f3fc"),
+    st.dataframe(summary_df.style.format("{:.4f}").highlight_max(axis=0, color="#f0d4c0"),
                  use_container_width=True)
     _interp(
         f"Across {cv_folds} stratified folds, "
@@ -1074,7 +1221,7 @@ with tab_obj5:
     if focus_barangay != "All Barangays" and focus_barangay in risk_by_brgy.index:
         risk_by_brgy = risk_by_brgy.loc[[focus_barangay]]
     fig, ax = plt.subplots(figsize=(9, max(3.2, len(risk_by_brgy) * 0.34)))
-    bar_colors = ["#b45309" if v >= 0.5 else "#f59e0b" if v >= 0.25 else "#0e7490"
+    bar_colors = ["#8a4420" if v >= 0.5 else "#b8860b" if v >= 0.25 else "#7c2d3a"
                   for v in risk_by_brgy["Mean Risk"]]
     ax.barh(risk_by_brgy.index, risk_by_brgy["Mean Risk"], color=bar_colors, alpha=0.9)
     ax.set_xlabel("Mean Predicted Probability of Dissatisfaction")
