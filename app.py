@@ -48,6 +48,10 @@ st.markdown("""
     --brand-text: #1c1917;
     --brand-muted: #78716c;
     --brand-border: #e7e0d5;
+    --sidebar-bg-top: #2a0f16;
+    --sidebar-bg-bottom: #4a1822;
+    --sidebar-text: #f5efe6;
+    --sidebar-muted: #e7d9c5;
 }
 
 html, body, .stApp {
@@ -55,9 +59,7 @@ html, body, .stApp {
     background: var(--brand-bg) !important;
     color: var(--brand-text) !important;
 }
-[data-testid="stAppViewContainer"] {
-    background: var(--brand-bg) !important;
-}
+[data-testid="stAppViewContainer"] { background: var(--brand-bg) !important; }
 [data-testid="stHeader"] { background: transparent !important; }
 [data-testid="stToolbar"] { background: transparent !important; }
 [data-testid="stDecoration"] { display: none !important; }
@@ -68,7 +70,6 @@ html, body, .stApp {
 [data-testid="stCaptionContainer"] * {
     font-family: 'Manrope', system-ui, sans-serif !important;
     font-size: 1.05rem !important;
-    color: var(--brand-text);
 }
 
 .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6,
@@ -88,23 +89,76 @@ html, body, .stApp {
 
 .block-container { padding-top: 1.3rem !important; padding-bottom: 2.8rem !important; max-width: 1500px; }
 
-[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #2a0f16 0%, #4a1822 100%) !important;
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] > div,
+[data-testid="stSidebar"] > div > div,
+[data-testid="stSidebarContent"],
+[data-testid="stSidebarUserContent"],
+[data-testid="stSidebarNav"] {
+    background: #2a0f16 !important;
+    background-image: linear-gradient(180deg, #2a0f16 0%, #4a1822 100%) !important;
     border-right: 1px solid #5a2230 !important;
 }
-[data-testid="stSidebar"] * {
-    color: #f5efe6 !important;
+
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] label,
+[data-testid="stSidebar"] li,
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3,
+[data-testid="stSidebar"] div,
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"] *,
+[data-testid="stSidebar"] [data-testid="stWidgetLabel"] *,
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] * {
+    color: var(--sidebar-text) !important;
     font-family: 'Manrope', system-ui, sans-serif !important;
 }
+
 [data-testid="stSidebar"] .stFileUploader label,
 [data-testid="stSidebar"] .stCheckbox label span,
 [data-testid="stSidebar"] .stSelectbox label,
-[data-testid="stSidebar"] .stSlider label {
-    color: #e7d9c5 !important;
+[data-testid="stSidebar"] .stSlider label,
+[data-testid="stSidebar"] [data-testid="stWidgetLabel"] p {
+    color: var(--sidebar-muted) !important;
     font-size: 0.98rem !important;
     font-weight: 600 !important;
 }
+
 [data-testid="stSidebar"] hr { border-color: #5a2230 !important; }
+
+[data-testid="stSidebar"] [data-baseweb="select"] > div,
+[data-testid="stSidebar"] [data-baseweb="input"] > div,
+[data-testid="stSidebar"] input {
+    background: #3a1a22 !important;
+    border-color: #5a2230 !important;
+    color: var(--sidebar-text) !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] svg,
+[data-testid="stSidebar"] svg { fill: var(--sidebar-muted) !important; }
+
+[data-testid="stSidebar"] [role="slider"] {
+    background: var(--brand-accent) !important;
+    border-color: var(--brand-accent) !important;
+}
+[data-testid="stSidebar"] [data-baseweb="slider"] [data-testid="stTickBar"] * {
+    color: var(--sidebar-muted) !important;
+}
+
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {
+    background: #3a1a22 !important;
+    border: 1px dashed #5a2230 !important;
+}
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] * {
+    color: var(--sidebar-muted) !important;
+}
+
+[data-testid="stSidebar"] button,
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzoneButton"] {
+    background: #5a2230 !important;
+    color: var(--sidebar-text) !important;
+    border: 1px solid #7c2d3a !important;
+}
 
 .hero {
     background: linear-gradient(135deg, #4a1822 0%, #7c2d3a 55%, #a14053 100%);
