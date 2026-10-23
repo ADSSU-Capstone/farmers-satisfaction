@@ -35,52 +35,155 @@ st.set_page_config(page_title="Farmers' Satisfaction Dashboard", layout="wide",
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-html, body, [class*="css"] { font-family: 'Inter', system-ui, sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,800&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+html, body, [class*="css"], .stApp p, .stApp li, .stApp span {
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 1.02rem;
+    letter-spacing: -0.005em;
+}
 .stApp { background: #f0f4f8; }
-.block-container { padding-top: 1.2rem; padding-bottom: 2.5rem; max-width: 1500px; }
+.block-container { padding-top: 1.3rem; padding-bottom: 2.8rem; max-width: 1500px; }
+
 [data-testid="stSidebar"] { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); border-right: 1px solid #334155; }
-[data-testid="stSidebar"] * { color: #e2e8f0 !important; }
+[data-testid="stSidebar"] * { color: #e2e8f0 !important; font-family: 'Manrope', sans-serif; }
 [data-testid="stSidebar"] .stCheckbox label span,
-[data-testid="stSidebar"] .stSelectbox label { color: #cbd5e1 !important; font-size: 0.85rem; }
+[data-testid="stSidebar"] .stSelectbox label { color: #cbd5e1 !important; font-size: 0.95rem; font-weight: 500; }
+[data-testid="stSidebar"] .stFileUploader label { font-size: 0.95rem; }
 [data-testid="stSidebar"] hr { border-color: #334155; }
-h1, h2, h3, h4 { color: #0f172a; font-weight: 700; }
-.hero { background: linear-gradient(135deg, #0e7490 0%, #0891b2 60%, #06b6d4 100%);
-        border-radius: 14px; padding: 26px 30px; color: #ffffff; margin-bottom: 20px;
-        box-shadow: 0 10px 22px -8px rgba(14, 116, 144, 0.45); }
-.hero h1 { color: #ffffff; margin: 0 0 6px 0; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.02em; }
-.hero p { color: #cffafe; margin: 0; font-size: 0.9rem; }
-.metric-card { background: #ffffff; border-radius: 10px; padding: 16px 18px;
-               border: 1px solid #e2e8f0; border-top: 3px solid #0e7490;
-               box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05); height: 100%; }
-.metric-label { color: #64748b; font-size: 0.68rem; font-weight: 600;
-                text-transform: uppercase; letter-spacing: 0.09em; }
-.metric-value { color: #0f172a; font-size: 1.9rem; font-weight: 800; margin-top: 6px; line-height: 1.1; }
-.metric-sub { color: #0e7490; font-size: 0.75rem; font-weight: 500; margin-top: 6px; }
-.section-header { color: #0f172a; font-size: 1.05rem; font-weight: 700;
-                  border-left: 4px solid #0e7490; padding-left: 12px; margin: 22px 0 12px 0; }
-.info-box { background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 9px;
-            padding: 13px 16px; color: #155e75; font-size: 0.88rem; line-height: 1.6; margin-top: 10px; }
-.warn-box { background: #fef3c7; border: 1px solid #fde68a; border-radius: 9px;
-            padding: 13px 16px; color: #78350f; font-size: 0.88rem; line-height: 1.6; margin-top: 10px; }
-.justify-box { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 9px;
-               padding: 14px 18px; color: #1e293b; font-size: 0.88rem; line-height: 1.65; }
-.sidebar-title { color: #22d3ee; margin: 0; font-size: 1.05rem; font-weight: 800; }
-.sidebar-sub { color: #94a3b8; font-size: 0.75rem; margin-top: 3px; }
-[data-baseweb="tab-list"] { gap: 8px; background: transparent; border-bottom: none !important;
-                            padding-bottom: 10px; }
-[data-baseweb="tab"] { background-color: #ffffff !important; border: 2px solid #cbd5e1 !important;
-                       border-radius: 8px !important; padding: 10px 16px !important;
-                       color: #334155 !important; font-weight: 600 !important;
-                       font-size: 0.82rem !important; height: auto !important; }
-[data-baseweb="tab"][aria-selected="true"] { background-color: #0e7490 !important;
-                                             border-color: #0e7490 !important;
-                                             color: #ffffff !important; }
+
+h1, h2, h3, h4 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: #0f172a;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    font-variation-settings: "opsz" 48;
+}
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.3rem; }
+
+.hero {
+    background: linear-gradient(135deg, #0e7490 0%, #0891b2 60%, #06b6d4 100%);
+    border-radius: 16px; padding: 30px 34px; color: #ffffff; margin-bottom: 22px;
+    box-shadow: 0 12px 26px -10px rgba(14, 116, 144, 0.5);
+}
+.hero h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 96;
+    color: #ffffff; margin: 0 0 8px 0;
+    font-size: 2.05rem; font-weight: 800; letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+.hero p {
+    color: #cffafe; margin: 0;
+    font-size: 1.02rem;
+    font-family: 'Manrope', sans-serif;
+}
+.hero p:last-child { letter-spacing: 0.02em; text-transform: uppercase; font-size: 0.88rem; }
+
+.metric-card {
+    background: #ffffff; border-radius: 12px; padding: 18px 20px;
+    border: 1px solid #e2e8f0; border-top: 3px solid #0e7490;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06); height: 100%;
+}
+.metric-label {
+    color: #64748b; font-size: 0.8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    font-family: 'Manrope', sans-serif;
+}
+.metric-value {
+    color: #0f172a;
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 96;
+    font-size: 2.3rem; font-weight: 800; margin-top: 8px; line-height: 1.05;
+    font-feature-settings: "tnum" 1;
+}
+.metric-sub {
+    color: #0e7490; font-size: 0.88rem; font-weight: 600; margin-top: 8px;
+    font-family: 'Manrope', sans-serif;
+}
+
+.section-header {
+    color: #0f172a;
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 48;
+    font-size: 1.3rem; font-weight: 700;
+    border-left: 4px solid #0e7490;
+    padding-left: 14px; margin: 26px 0 14px 0;
+    letter-spacing: -0.01em;
+}
+
+.info-box {
+    background: #ecfeff; border: 1px solid #a5f3fc; border-radius: 10px;
+    padding: 15px 18px; color: #155e75;
+    font-size: 0.98rem; line-height: 1.7; margin-top: 12px;
+    font-family: 'Manrope', sans-serif;
+}
+.warn-box {
+    background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px;
+    padding: 15px 18px; color: #78350f;
+    font-size: 0.98rem; line-height: 1.7; margin-top: 12px;
+    font-family: 'Manrope', sans-serif;
+}
+.justify-box {
+    background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 10px;
+    padding: 16px 20px; color: #1e293b;
+    font-size: 0.98rem; line-height: 1.75;
+    font-family: 'Manrope', sans-serif;
+}
+.justify-box b { color: #0e7490; font-weight: 700; }
+
+.sidebar-title {
+    color: #22d3ee; margin: 0;
+    font-family: 'Fraunces', Georgia, serif;
+    font-variation-settings: "opsz" 48;
+    font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em;
+}
+.sidebar-sub {
+    color: #94a3b8; font-size: 0.85rem; margin-top: 4px;
+    font-family: 'Manrope', sans-serif;
+}
+
+[data-baseweb="tab-list"] {
+    gap: 10px; background: transparent;
+    border-bottom: none !important; padding-bottom: 12px;
+}
+[data-baseweb="tab"] {
+    background-color: #ffffff !important;
+    border: 2px solid #cbd5e1 !important;
+    border-radius: 9px !important;
+    padding: 12px 18px !important;
+    color: #334155 !important;
+    font-weight: 700 !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.95rem !important;
+    letter-spacing: -0.005em !important;
+    height: auto !important;
+}
+[data-baseweb="tab"][aria-selected="true"] {
+    background-color: #0e7490 !important;
+    border-color: #0e7490 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px -4px rgba(14, 116, 144, 0.5);
+}
 [data-baseweb="tab-highlight"] { display: none !important; }
-[data-baseweb="tab-border"] { display: none !important; }
+[data-baseweb="tab-border"]    { display: none !important; }
+
+[data-testid="stDataFrame"] *,
+[data-testid="stTable"] * {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.92rem !important;
+}
+[data-testid="stMetricLabel"] * { font-size: 0.95rem !important; font-weight: 600 !important; }
+[data-testid="stMetricValue"] * { font-family: 'Fraunces', Georgia, serif !important; font-size: 1.9rem !important; }
+.stButton > button, .stDownloadButton > button {
+    font-family: 'Manrope', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+    border-radius: 8px !important;
+}
 </style>
 """, unsafe_allow_html=True)
-
 VALID_BARANGAYS = {
     "Batucan", "Zillovia", "Labnig", "Causwagan", "Buena Gracia",
     "Marbon", "Del Monte", "San Agustin", "San Isidro", "La Flora",
